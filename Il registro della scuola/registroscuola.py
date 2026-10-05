@@ -73,9 +73,6 @@ def media_classe(studenti: list[dict], classe: str) -> tuple[float | None, int]:
 
 def stampa_studente(studente: dict):
     """Stampa un record su una sola riga: ID cognome nome classe media."""
-    # Usa print() con una f-string, campi separati da UNO spazio.
-    # Esempio di formato atteso: 103 Ferrero Sara 5A 8.5
-    # Questa funzione si occupa SOLO di stampare, nessun'altra logica.
     print(f"{studente['id']} {studente['cognome']} {studente['nome']} {studente['classe']} {studente['media']}")
 
 
