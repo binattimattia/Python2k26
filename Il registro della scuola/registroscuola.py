@@ -71,7 +71,7 @@ def media_classe(studenti: list[dict], classe: str) -> tuple[float | None, int]:
     return somma / conteggio, conteggio
 
 
-def stampa_studente(studente: dict):
+def stampa_studente(studente: dict) -> None:
     """Stampa un record su una sola riga: ID cognome nome classe media."""
     print(f"{studente['id']} {studente['cognome']} {studente['nome']} {studente['classe']} {studente['media']}")
 
