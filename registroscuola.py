@@ -1,4 +1,4 @@
-def leggi_studenti(nome_file):
+def leggi_studenti(nome_file: str) -> list[dict]:
     """Legge studenti.csv e restituisce una lista di dizionari."""
     studenti = []
     with open(nome_file, "r", encoding="utf-8") as f:
@@ -18,89 +18,98 @@ def leggi_studenti(nome_file):
                 "media": float(campi[4])
             }
             studenti.append(studente)
-        return studenti
-            
-def leggi_richieste(nome_file):
+    return studenti
+
+
+def leggi_richieste(nome_file: str) -> tuple[list[int], str, str]:
     """Legge richieste.txt e restituisce (lista_id, cognome, classe)."""
-    # 1. Apri il file e leggi le tre righe (es. f.readlines()).
-    # 2. Per ogni riga ricordati di fare strip().
-    # 3. Riga 1: e' una stringa tipo "103,107,115,110".
-    #    - fai split(",") e converti OGNI elemento in int
-    #      (ti servira' una list comprehension o un ciclo for).
-    # 4. Riga 2: e' il cognome (stringa, la lasci cosi').
-    # 5. Riga 3: e' la classe (stringa).
-    # 6. Restituisci le tre informazioni insieme: return ids, cognome, classe
     with open(nome_file, "r", encoding="utf-8") as f:
-        pass
+        righe = f.readlines()
+
+        elementi = []
+        for elemento in righe[0].strip().split(","):
+            elementi.append(int(elemento))
+            
+        cognomi = righe[1].strip()
+        classi = righe[2].strip()
+
+    return elementi, cognomi, classi
 
 
-def cerca_per_id(studenti, id_cercato):
+def cerca_per_id(studenti: list[dict], id_cercato: int) -> dict | None:
     """Restituisce il dizionario dello studente con quell'ID, oppure None."""
-    # 1. Scorri la lista degli studenti.
-    # 2. Se studente["id"] == id_cercato -> restituiscilo subito (return).
-    # 3. Se il ciclo finisce senza trovare nulla -> return None.
-    pass
+    for studente in studenti:
+        if studente["id"] == id_cercato:
+            return studente
+    return None
 
 
-def cerca_per_cognome(studenti, cognome):
+def cerca_per_cognome(studenti: list[dict], cognome: str) -> list[dict]:
     """Restituisce la lista degli studenti con quel cognome."""
-    # 1. Crea una lista vuota per i risultati.
-    # 2. Il confronto NON deve distinguere maiuscole/minuscole:
-    #    confronta studente["cognome"].lower() con cognome.lower()
-    # 3. Aggiungi alla lista i dizionari che corrispondono.
-    # 4. Restituisci la lista (puo' essere vuota: la gestirai nel main).
-    pass
+    risultati = []
+
+    for studente in studenti:
+        if studente["cognome"].lower() == cognome.lower():
+            risultati.append(studente)
+
+    return risultati
 
 
-def media_classe(studenti, classe):
+def media_classe(studenti: list[dict], classe: str) -> tuple[float | None, int]:
     """Restituisce (media, numero_studenti) della classe indicata."""
-    # 1. Usa DUE accumulatori: somma = 0 e conteggio = 0.
-    # 2. Scorri gli studenti: se studente["classe"] == classe
-    #    -> somma += studente["media"] e conteggio += 1
-    #    (se vuoi essere tollerante, confronta anche qui con .upper()).
-    # 3. Dividi SOLO dopo aver controllato che conteggio != 0.
-    # 4. Se conteggio == 0 restituisci (None, 0) (o un altro modo a tua scelta
-    #    per segnalare "classe vuota").
-    # 5. Altrimenti restituisci (somma / conteggio, conteggio).
-    pass
+    somma = 0
+    conteggio = 0
+
+    for studente in studenti:
+        if studente["classe"].upper() == classe.upper():
+            somma += studente["media"]
+            conteggio += 1
+
+    if conteggio == 0:
+        return None, 0
+
+    return somma / conteggio, conteggio
 
 
-def stampa_studente(studente):
+def stampa_studente(studente: dict):
     """Stampa un record su una sola riga: ID cognome nome classe media."""
     # Usa print() con una f-string, campi separati da UNO spazio.
     # Esempio di formato atteso: 103 Ferrero Sara 5A 8.5
     # Questa funzione si occupa SOLO di stampare, nessun'altra logica.
-    pass
+    print(f"{studente['id']} {studente['cognome']} {studente['nome']} {studente['classe']} {studente['media']}")
 
 
 def main():
     studenti = leggi_studenti("studenti.csv")
-    #ids, cognome, classe = leggi_richieste("richieste.txt")
+    ids, cognome, classe = leggi_richieste("richieste.txt")
 
-    # --- Ricerca per ID ---
-    # print("--- Ricerca per ID ---")
-    # Per ogni id in ids (nell'ORDINE del file):
-    #   - chiama cerca_per_id
-    #   - se il risultato e' None -> print(f"ID {id} non trovato")
-    #   - altrimenti -> stampa_studente(risultato)
+    print("--- Ricerca per ID ---")
+    for id in ids:
+        studente = cerca_per_id(studenti, id)
+        if studente is None:
+            print(f"Studente con ID {id} non trovato")
+        else:
+            stampa_studente(studente)
 
-    # --- Ricerca per cognome ---
-    # Stampa una riga vuota, poi l'intestazione:
-    #   --- Ricerca per cognome: <cognome> ---
-    # Chiama cerca_per_cognome:
-    #   - se la lista e' vuota -> "Nessuno studente trovato"
-    #   - altrimenti stampa_studente per ognuno
+    print("")
 
-    # --- Media della classe ---
-    # Stampa una riga vuota, poi l'intestazione:
-    #   --- Media della classe <classe> ---
-    # Chiama media_classe:
-    #   - se il conteggio e' 0 -> "Nessuno studente nella classe <classe>"
-    #   - altrimenti stampa:
-    #       Studenti considerati: <n>
-    #       Media: <media con 2 decimali>   (suggerimento: f"{media:.2f}")
-    pass
+    print(f"--- Ricerca per cognome: {cognome} ---")
+    cognomi_studenti = cerca_per_cognome(studenti, cognome)
+    if len(cognomi_studenti) == 0:
+        print("Nessuno studente trovato")
+    else:
+        for studente in cognomi_studenti:
+            stampa_studente(studente)
 
+    print("")
+
+    print(f"--- Media della classe {classe} ---")
+    media, conteggio = media_classe(studenti, classe)
+    if conteggio == 0:
+        print(f"Nessuno studente nella classe {classe}")
+    else:
+        print(f"Studenti considerati: {conteggio}")
+        print(f"Media: {media:.2f}")
 
 if __name__ == "__main__":
     main()
